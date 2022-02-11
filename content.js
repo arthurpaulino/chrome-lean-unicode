@@ -4,90 +4,133 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Author: Arthur Paulino
 */
 
-var escapeChar = null;
-var isOn = null;
-var matchRegex = null;
+const SET_ICON_PATH = "SET_ICON_PATH";
+const GET_SETTINGS = "GET_SETTINGS";
+const SET_SETTINGS = "SET_SETTINGS";
 
-function setIsOn(value) {
-    isOn = value;
-    chrome.runtime.sendMessage({
-        type: "setIconPath",
-        data : isOn? "on.png" : "off.png"
-    });
-}
+const ON_ICON_PATH  = "on.png";
+const OFF_ICON_PATH = "off.png";
 
-function setAndPersistSettings(settings) {
-    setIsOn(settings.isOn);
-    escapeChar = settings.escapeChar;
-    matchRegex = RegExp(
-        escapeChar + (escapeChar === "\\"? "\\((?!\\s).)+\\s" : "((?!\\s).)+\\s"),
-        "g"
-    );
-    chrome.runtime.sendMessage({
-        type: "setSettings",
-        data: settings
-    });
-}
+const ABBREVIATIONS_PATH = "abbreviations.json";
 
-chrome.runtime.sendMessage({type: "getSettings"}, response => {
-    try {
-        isOn = response.isOn;
-        escapeChar = response.escapeChar;
-    }
-    catch {
-        isOn = true;
-        escapeChar = "\\";
-    }
-    finally{
-        setAndPersistSettings({
-            isOn: isOn,
-            escapeChar: escapeChar
-        });
-    }
-});
+const INPUT_LISTENER_NAME = "input";
 
-fetch(chrome.runtime.getURL("abbreviations.json"))
-    .then(response => response.json())
-    .then(json => {
-        for (const key of Object.keys(json)) {
-            abbreviations[escapeChar + key + " "] = json[key] + " ";
-        }
-        abbreviationsKeys = Object.keys(abbreviations);
-    });
-    
-var abbreviations = {};
-var abbreviationsKeys = []
+const IS_ON_KEY       = "is_on";
+const ESCAPE_CHAR_KEY = "escape_char";
+const URL_MATCHES_KEY = "url_matches";
 
-function transform(str) {
-    const matches = str.match(matchRegex);
-    if (!matches) return str;
-    for (match of matches) {
-        if (abbreviationsKeys.includes(match)) {
-            str = str.replace(match, abbreviations[match]);
-        }
-    }
-    return str;
-}
+const DEFAULT_SETTINGS = {};
+DEFAULT_SETTINGS[IS_ON_KEY] = true;
+DEFAULT_SETTINGS[ESCAPE_CHAR_KEY] = "\\";
+DEFAULT_SETTINGS[URL_MATCHES_KEY] = [
+    "https://leanprover.zulipchat.com",
+    "https://github.com/leanprover-community/mathlib"
+];
 
-var lastCtrlAt = 0;
-
-document.onkeydown = (evt) => {
-    if (evt.altKey) {
-        const now = Date.now();
-        if (now - lastCtrlAt < 500) {
-            setIsOn(!isOn);
-        }
-        lastCtrlAt = now;
-    }
-};
+// flow control variables
+var isOn          = false;
+var urlMatches    = null;
+var urlMatched    = false;
+var matchRegex    = null;
+var abbreviations = null;
+var lastCtrlAt    = 0;
 
 // todo: how to add the right amount of listeners?
 const inputs = document.querySelectorAll("div");
 
-for (const input of inputs) {
-    input.addEventListener("input", (evt) => {
-        if (isOn) {
-            evt.target.value = transform(evt.target.value);
-        }
+function setIsOn(value) {
+    isOn = value;
+    chrome.runtime.sendMessage({
+        type: SET_ICON_PATH,
+        data : isOn? ON_ICON_PATH : OFF_ICON_PATH
     });
 }
+
+function getOrFail(obj, key) {
+    if (!(key in obj)) {
+        throw 0;
+    }
+    return obj[key];
+}
+
+function handleInput(e) {
+    if (!isOn) return;
+
+    const matches = e.target.value.match(matchRegex);
+    if (!matches) return;
+
+    for (const match of matches) {
+        if (match in abbreviations) {
+            e.target.value = e.target.value.replace(
+                match,
+                abbreviations[match]
+            );
+        }
+    }
+}
+
+function setSettings(settings) {
+    urlMatches = getOrFail(settings, URL_MATCHES_KEY);
+    const escapeChar = getOrFail(settings, ESCAPE_CHAR_KEY);
+    for (const url of urlMatches) {
+        if (document.URL.startsWith(url)) {
+            urlMatched = true;
+            break;
+        }
+    }
+
+    for (const input of inputs) {
+        input.removeEventListener(INPUT_LISTENER_NAME, handleInput);
+    }
+
+    if (!urlMatched) {
+        document.onkeydown = null;
+        setIsOn(false);
+    }
+    else {
+        setIsOn(getOrFail(settings, IS_ON_KEY) || isOn);
+
+        fetch(chrome.runtime.getURL(ABBREVIATIONS_PATH))
+            .then(response => response.json())
+            .then(json => {
+                abbreviations = {};
+                for (const key of Object.keys(json)) {
+                    abbreviations[escapeChar + key + " "] = json[key] + " ";
+                }
+            });
+        matchRegex = RegExp((escapeChar === "\\"? "\\\\" : escapeChar) + "((?!\\s).)+\\s", "g");
+
+        document.onkeydown = e => {
+            if (e.altKey && urlMatched) {
+                const now = Date.now();
+                if (now - lastCtrlAt < 500) {
+                    setIsOn(!isOn);
+                    lastCtrlAt = 0;
+                }
+                else {
+                    lastCtrlAt = now;
+                }
+            }
+        };
+
+        for (const input of inputs) {
+            input.addEventListener(INPUT_LISTENER_NAME, handleInput);
+        }
+    }
+}
+
+function setAndPersistSettings(settings) {
+    setSettings(settings);
+    chrome.runtime.sendMessage({
+        type: SET_SETTINGS,
+        data: settings
+    });
+}
+
+chrome.runtime.sendMessage(
+    {type: GET_SETTINGS},
+    settings => {
+        try { setSettings(settings); }
+        catch { setAndPersistSettings(DEFAULT_SETTINGS); }
+    }
+);

@@ -25,7 +25,7 @@
 
     "content_scripts": [
         {
-            "matches": ["https://leanprover.zulipchat.com/*"],
+            "matches": ["<all_urls>"],
             "js": ["content.js"]
         }
     ],
@@ -33,7 +33,7 @@
     "web_accessible_resources": [
         {
             "resources": ["abbreviations.json"],
-            "matches": ["https://leanprover.zulipchat.com/*"],
+            "matches": ["<all_urls>"],
             "extension_ids": []
         }
     ]
