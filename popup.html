@@ -1,14 +1,20 @@
 <html>
 <body>
 
-<form style="width: 250px;">
+<form style="width: 260px">
   <ul style="padding-left:0px">
     <li style="display:inline">Escape key:</li>
     <li style="display:inline">
-      <input
-        style="width: 24px; height: 24px"
-        id="escape_key">
-      </input>
+      <span
+        contenteditable="true"
+        id="escape_key"
+        style="display: inline-block;
+               padding: 3px;
+               font-size: 14px;
+               border: solid 1px #767676;
+               width: 17px;
+               height: 17px">
+      </span>
     </li>
   </ul>
   <ul style="padding-left:0px">
@@ -18,9 +24,11 @@
         contenteditable="true"
         id="url_matches"
         style="display: inline-block;
+               padding: 3px;
+               font-size: 14px;
                border: solid 1px #767676;
                width: 250px;
-               min-height: 24px">
+               min-height: 17px">
       </span>
     </li>
   </ul>

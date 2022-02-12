@@ -29,7 +29,6 @@ DEFAULT_SETTINGS[URL_MATCHES_KEY] = [
 
 // flow control variables
 var isOn          = false;
-var urlMatches    = null;
 var matchRegex    = null;
 var abbreviations = null;
 var lastCtrlAt    = 0;
@@ -69,7 +68,7 @@ function handleInputEvent(e) {
 }
 
 function setSettings(settings) {
-    urlMatches = getOrFail(settings, URL_MATCHES_KEY);
+    const urlMatches = getOrFail(settings, URL_MATCHES_KEY);
     const escapeChar = getOrFail(settings, ESCAPE_CHAR_KEY);
 
     var urlMatched = false;
