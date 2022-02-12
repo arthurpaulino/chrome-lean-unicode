@@ -52,7 +52,7 @@ function getOrFail(obj, key) {
     return obj[key];
 }
 
-function handleInput(e) {
+function handleInputEvent(e) {
     if (!isOn) return;
 
     const matches = e.target.value.match(matchRegex);
@@ -81,7 +81,7 @@ function setSettings(settings) {
     }
 
     for (const input of inputs) {
-        input.removeEventListener(INPUT_LISTENER_NAME, handleInput);
+        input.removeEventListener(INPUT_LISTENER_NAME, handleInputEvent);
     }
 
     if (!urlMatched) {
