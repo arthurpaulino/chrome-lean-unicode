@@ -34,12 +34,13 @@ chrome.storage.sync.get(
 escapeCharField.addEventListener(
     INPUT_LISTENER_NAME,
     e => {
-        const val = e.target.innerText;
+        var val = e.target.innerText.replace(/(\n)+/g, "");
         switch (val.length) {
             case 0:
                 e.target.innerText = oldEscapeChar;
                 break;
             case 1:
+                e.target.innerText = val;
                 break;
             case 2:
                 e.target.innerText = val[0] !== oldEscapeChar ? val[0] : val[1];
