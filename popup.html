@@ -1,34 +1,36 @@
 <html>
 <body>
 
-<form style="width: 260px">
+<div style="width: 287px; min-height: 153px;">
   <ul style="padding-left:0px">
     <li style="display:inline">Escape key:</li>
     <li style="display:inline">
       <span
         contenteditable="true"
-        id="escape_key"
+        id="escape_char"
         style="display: inline-block;
+               caret-color: transparent;
                padding: 3px;
-               font-size: 14px;
+               text-align: center;
+               font-size: 12px;
                border: solid 1px #767676;
-               width: 17px;
-               height: 17px">
+               width: 15px;
+               height: 15px">
       </span>
     </li>
   </ul>
   <ul style="padding-left:0px">
-    <li>URL matches:</li>
+    <li style="display:inline">URL matches:</li>
     <li style="display:inline">
       <span
         contenteditable="true"
         id="url_matches"
         style="display: inline-block;
                padding: 3px;
-               font-size: 14px;
+               font-size: 12px;
                border: solid 1px #767676;
-               width: 250px;
-               min-height: 17px">
+               width: 280px;
+               min-height: 15px">
       </span>
     </li>
   </ul>
@@ -37,15 +39,16 @@
     <li style="display:inline">
       <input
         type="checkbox"
-        id="on_by_default">
+        id="is_on">
     </input>
     </li>
   </ul>
-  <ul style="padding-left:0px; text-align: center;">
-    <li style="display:inline"> <input type="submit" value="Default"> </li>
-    <li style="display:inline"> <input type="submit" value="Save"> </li>
-  </ul>
-</form>
+  <div style="text-align: center;">
+    <button id="save">Save</button>
+  </div>
+</div>
+
+<script src="popup.js"></script>
 
 </body>
 </html>

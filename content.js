@@ -15,13 +15,13 @@ const ABBREVIATIONS_PATH = "abbreviations.json";
 
 const INPUT_LISTENER_NAME = "input";
 
-const IS_ON_KEY       = "is_on";
 const ESCAPE_CHAR_KEY = "escape_char";
 const URL_MATCHES_KEY = "url_matches";
+const IS_ON_KEY       = "is_on";
 
 const DEFAULT_SETTINGS = {};
-DEFAULT_SETTINGS[IS_ON_KEY] = true;
 DEFAULT_SETTINGS[ESCAPE_CHAR_KEY] = "\\";
+DEFAULT_SETTINGS[IS_ON_KEY] = true;
 DEFAULT_SETTINGS[URL_MATCHES_KEY] = [
     "https://leanprover.zulipchat.com",
     "https://github.com/leanprover-community/mathlib"
@@ -114,7 +114,7 @@ function setSettings(settings) {
         };
 
         for (const input of inputs) {
-            input.addEventListener(INPUT_LISTENER_NAME, handleInput);
+            input.addEventListener(INPUT_LISTENER_NAME, handleInputEvent);
         }
     }
 }
@@ -126,6 +126,16 @@ function setAndPersistSettings(settings) {
         data: settings
     });
 }
+
+// messages that might come from popup
+chrome.runtime.onMessage.addListener(
+    (request, _, closePopup) => {
+        if (request.type === SET_SETTINGS) {
+            setSettings(request.data);
+        }
+        closePopup();
+    }
+);
 
 chrome.runtime.sendMessage(
     {type: GET_SETTINGS},

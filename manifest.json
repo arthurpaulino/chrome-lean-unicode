@@ -2,10 +2,10 @@
     "manifest_version": 3,
     "name": "chrome-lean-unicode",
     "version": "1.0",
-
-    "permissions": ["storage", "activeTab", "scripting"],
     
     "author": "Arthur Paulino",
+
+    "permissions": ["storage", "tabs", "scripting"],
 
     "description": "Type Lean unicode characters in your web browser",
 
@@ -32,9 +32,8 @@
 
     "web_accessible_resources": [
         {
-            "resources": ["abbreviations.json"],
             "matches": ["<all_urls>"],
-            "extension_ids": []
+            "resources": ["abbreviations.json"]
         }
     ]
 }

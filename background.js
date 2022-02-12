@@ -9,11 +9,11 @@ const GET_SETTINGS  = "GET_SETTINGS";
 const SET_SETTINGS  = "SET_SETTINGS";
 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
+    (request, sender, sendResponse) => {
         if (request.type === SET_ICON_PATH) {
             chrome.action.setIcon({
-                "path": request.data,
-                "tabId": sender.tab.id
+                path: request.data,
+                tabId: sender.tab.id
             });
         }
         else if (request.type === GET_SETTINGS) {
