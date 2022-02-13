@@ -5,13 +5,12 @@ Author: Arthur Paulino
 */
 
 const SET_ICON_PATH = "SET_ICON_PATH";
-const GET_SETTINGS = "GET_SETTINGS";
-const SET_SETTINGS = "SET_SETTINGS";
+const SET_SETTINGS  = "SET_SETTINGS";
 
-const ON_ICON_PATH  = "on.png";
-const OFF_ICON_PATH = "off.png";
-
+const ON_ICON_PATH       = "img/on.png";
+const OFF_ICON_PATH      = "img/off.png";
 const ABBREVIATIONS_PATH = "abbreviations.json";
+
 
 const INPUT_LISTENER_NAME = "input";
 
@@ -46,7 +45,7 @@ function setIsOn(value) {
     isOn = value;
     chrome.runtime.sendMessage({
         type: SET_ICON_PATH,
-        data : isOn? ON_ICON_PATH : OFF_ICON_PATH
+        data: isOn? ON_ICON_PATH : OFF_ICON_PATH
     });
 }
 
@@ -136,19 +135,15 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
-chrome.runtime.sendMessage(
-    {type: GET_SETTINGS},
+chrome.storage.sync.get(
+    null,
     settings => {
-        console.log(settings);
         try {
             setSettings(settings);
         }
         catch {
             setSettings(DEFAULT_SETTINGS);
-            chrome.runtime.sendMessage({
-                type: SET_SETTINGS,
-                data: DEFAULT_SETTINGS
-            });
+            chrome.storage.sync.set(DEFAULT_SETTINGS);
         }
     }
 );

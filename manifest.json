@@ -10,15 +10,14 @@
     "description": "Type Lean unicode characters in your web browser",
 
     "icons": {
-        "16" : "off.png",
-        "36" : "icon36.png",
-        "48" : "icon48.png",
-        "128": "icon128.png"
+        "16" : "img/off.png",
+        "48" : "img/icon36.png",
+        "128": "img/icon128.png"
     },
 
     "action": {
         "default_icon": {
-            "16" : "off.png"
+            "16" : "img/off.png"
         },
         "default_title": "chrome-lean-unicode",
         "default_popup": "popup.html"
