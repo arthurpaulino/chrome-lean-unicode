@@ -65,10 +65,13 @@ function handleInputEvent(e) {
 
     for (const match of matches) {
         if (match in abbreviations) {
+            const lengthToEnd = e.target.value.length - e.target.selectionStart;
             e.target.value = e.target.value.replace(
                 match,
                 abbreviations[match]
             );
+            const at = e.target.value.length - lengthToEnd;
+            e.target.setSelectionRange(at, at);
         }
     }
 }
