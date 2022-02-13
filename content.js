@@ -127,13 +127,12 @@ function setAndPersistSettings(settings) {
     });
 }
 
-// messages that might come from popup
+// messages that might come from the popup
 chrome.runtime.onMessage.addListener(
-    (request, _, closePopup) => {
+    (request, _, __) => {
         if (request.type === SET_SETTINGS) {
             setSettings(request.data);
         }
-        closePopup();
     }
 );
 

@@ -28,47 +28,49 @@ chrome.storage.sync.get(
         onByDefaultField.checked  = settings[IS_ON_ID];
 
         oldEscapeChar = escapeCharField.innerText;
-    }
-);
 
-escapeCharField.addEventListener(
-    INPUT_LISTENER_NAME,
-    e => {
-        var val = e.target.innerText.replace(/(\n)+/g, "");
-        switch (val.length) {
-            case 0:
-                e.target.innerText = oldEscapeChar;
-                break;
-            case 1:
-                e.target.innerText = val;
-                break;
-            case 2:
-                e.target.innerText = val[0] !== oldEscapeChar ? val[0] : val[1];
-                break;
-            default:
-                e.target.innerText = val[val.length - 1];
+        escapeCharField.addEventListener(
+            INPUT_LISTENER_NAME,
+            e => {
+                var val = e.target.innerText.replace(/[\n\s]+/g, "");
+                switch (val.length) {
+                    case 0:
+                        e.target.innerText = oldEscapeChar;
+                        break;
+                    case 1:
+                        e.target.innerText = val;
+                        break;
+                    case 2:
+                        e.target.innerText = val[0] !== oldEscapeChar ? val[0] : val[1];
+                        break;
+                    default:
+                        e.target.innerText = val[val.length - 1];
+                    }
+                oldEscapeChar = e.target.innerText;
             }
-        oldEscapeChar = e.target.innerText;
+        );
     }
 );
 
 saveButton.onclick = () => {
     const settings = {};
     settings[ESCAPE_CHAR_ID] = escapeCharField.innerText;
-    settings[IS_ON_ID] = onByDefaultField.checked;
+    settings[IS_ON_ID]       = onByDefaultField.checked;
     settings[URL_MATCHES_ID] = urlMatchesField.innerText    
         .replace(/[;,\s\n]+/g, "\n").split("\n");
-    chrome.tabs.query(
-        { active: true, currentWindow: true },
-        tabs => {
-            chrome.storage.sync.set(
-                settings,
-                () => {
-                    chrome.tabs.sendMessage(
-                        tabs[0].id,
-                        { type: SET_SETTINGS, data: settings },
-                        close
-                    )
+    chrome.storage.sync.set(
+        settings,
+        () => {
+            chrome.tabs.query(
+                {},
+                tabs => {
+                    for (const tab of tabs) {
+                        chrome.tabs.sendMessage(
+                            tab.id,
+                            { type: SET_SETTINGS, data: settings }
+                        );
+                    }
+                    close();
                 }
             );
         }
