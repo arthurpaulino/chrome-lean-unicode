@@ -34,6 +34,7 @@ const fixedEscapeChars = {
 
 // flow control variables
 var isOn          = false;
+var firstTime     = true;
 var matchRegex    = null;
 var abbreviations = null;
 var lastCtrlAt    = 0;
@@ -93,7 +94,10 @@ function setSettings(settings) {
         setIsOn(false);
     }
     else {
-        setIsOn(getOrFail(settings, IS_ON_KEY) || isOn);
+        if (firstTime) {
+            setIsOn(getOrFail(settings, IS_ON_KEY));
+            firstTime = false;
+        }
 
         fetch(chrome.runtime.getURL(ABBREVIATIONS_PATH))
             .then(response => response.json())
