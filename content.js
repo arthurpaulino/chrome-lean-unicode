@@ -139,7 +139,10 @@ chrome.runtime.onMessage.addListener(
 chrome.runtime.sendMessage(
     {type: GET_SETTINGS},
     settings => {
-        try { setSettings(settings); }
+        console.log(settings);
+        try {
+            setSettings(settings);
+        }
         catch {
             setSettings(DEFAULT_SETTINGS);
             chrome.runtime.sendMessage({

@@ -9,7 +9,7 @@ const GET_SETTINGS  = "GET_SETTINGS";
 const SET_SETTINGS  = "SET_SETTINGS";
 
 chrome.runtime.onMessage.addListener(
-    (request, sender, sendResponse) => {
+    (request, sender, callback) => {
         if (request.type === SET_ICON_PATH) {
             chrome.action.setIcon({
                 path: request.data,
@@ -17,12 +17,13 @@ chrome.runtime.onMessage.addListener(
             });
         }
         else if (request.type === GET_SETTINGS) {
-            try {
-                chrome.storage.sync.get(null, sendResponse);
-            }
-            catch {
-                sendResponse(null);
-            }
+            chrome.storage.sync.get(
+                null,
+                data => {
+                    console.log(data);
+                    callback(data);
+                }
+            );
         }
         else if (request.type === SET_SETTINGS) {
             chrome.storage.sync.set(request.data);
