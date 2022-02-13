@@ -9,11 +9,16 @@
 
     "description": "Type Lean unicode characters in your web browser",
 
+    "icons": {
+        "16" : "off.png",
+        "36" : "icon36.png",
+        "48" : "icon48.png",
+        "128": "icon128.png"
+    },
+
     "action": {
         "default_icon": {
-            "16": "on.png",
-            "24": "on.png",
-            "32": "on.png"
+            "16" : "off.png"
         },
         "default_title": "chrome-lean-unicode",
         "default_popup": "popup.html"
