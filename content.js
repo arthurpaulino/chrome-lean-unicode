@@ -27,6 +27,12 @@ DEFAULT_SETTINGS[URL_MATCHES_KEY] = [
     "https://github.com/leanprover-community/mathlib"
 ];
 
+const fixedEscapeChars = {
+    "\\" : "\\\\",
+    "."  : "\\.",
+    "*"  : "\\*",
+}
+
 // flow control variables
 var isOn          = false;
 var matchRegex    = null;
@@ -98,7 +104,9 @@ function setSettings(settings) {
                     abbreviations[escapeChar + key + " "] = json[key] + " ";
                 }
             });
-        matchRegex = RegExp((escapeChar === "\\"? "\\\\" : escapeChar) + "((?!\\s).)+\\s", "g");
+        const fixedEscapeChar = escapeChar in fixedEscapeChars ?
+            fixedEscapeChars[escapeChar] : escapeChar;
+        matchRegex = RegExp(fixedEscapeChar + "((?!\\s).)+\\s", "g");
 
         document.onkeydown = e => {
             if (e.altKey && urlMatched) {
@@ -119,14 +127,6 @@ function setSettings(settings) {
     }
 }
 
-function setAndPersistSettings(settings) {
-    setSettings(settings);
-    chrome.runtime.sendMessage({
-        type: SET_SETTINGS,
-        data: settings
-    });
-}
-
 // messages that might come from the popup
 chrome.runtime.onMessage.addListener(
     (request, _, __) => {
@@ -140,6 +140,12 @@ chrome.runtime.sendMessage(
     {type: GET_SETTINGS},
     settings => {
         try { setSettings(settings); }
-        catch { setAndPersistSettings(DEFAULT_SETTINGS); }
+        catch {
+            setSettings(DEFAULT_SETTINGS);
+            chrome.runtime.sendMessage({
+                type: SET_SETTINGS,
+                data: DEFAULT_SETTINGS
+            });
+        }
     }
 );
