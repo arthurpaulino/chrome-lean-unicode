@@ -11,7 +11,6 @@ const ON_ICON_PATH       = "img/on.png";
 const OFF_ICON_PATH      = "img/off.png";
 const ABBREVIATIONS_PATH = "abbreviations.json";
 
-
 const INPUT_LISTENER_NAME = "input";
 
 const ESCAPE_CHAR_KEY = "escape_char";
@@ -33,11 +32,13 @@ const fixedEscapeChars = {
 }
 
 // flow control variables
-var isOn          = false;
-var firstTime     = true;
-var matchRegex    = null;
-var abbreviations = null;
-var lastCtrlAt    = 0;
+var isOn              = false;
+var firstTime         = true;
+var matchRegex        = null;
+var escapeCharLength  = null;
+var abbreviations     = null;
+var abbreviationsKeys = null;
+var lastCtrlAt        = 0;
 
 // todo: how to add the right amount of listeners?
 const inputs = document.querySelectorAll("div");
@@ -57,6 +58,32 @@ function getOrFail(obj, key) {
     return obj[key];
 }
 
+function longestMatchLength(str1, str2) {
+    const max = Math.max(str1.length, str2.length);
+    for (var i = 0; i < max; i++) {
+        if (str1[i] !== str2[i]) {
+            return i;
+        }
+    }
+    return max;
+}
+
+function getLongestAbbreviationMatch(match) {
+    var longestMatch = 0;
+    var longestMatchKey = null;
+    for (const key of abbreviationsKeys) {
+        const matchLength = longestMatchLength(match, key);
+        if (matchLength > longestMatch) {
+            longestMatch = matchLength;
+            longestMatchKey = key;
+        }
+    }
+    if (longestMatch > escapeCharLength) {
+        return longestMatchKey;
+    }
+    return null;
+}
+
 function handleInputEvent(e) {
     if (!isOn) return;
 
@@ -64,14 +91,15 @@ function handleInputEvent(e) {
     if (!matches) return;
 
     for (const match of matches) {
-        if (match in abbreviations) {
+        const longestMatchKey = getLongestAbbreviationMatch(match);
+        if (longestMatchKey) {
             const atBefore = e.target.selectionStart;
             if (atBefore === 0) return;
             if (e.target.value[atBefore - 1] !== " ") return;
             const lengthToEnd = e.target.value.length - atBefore;
             e.target.value = e.target.value.replace(
                 match,
-                abbreviations[match]
+                abbreviations[longestMatchKey]
             );
             const atAfter = e.target.value.length - lengthToEnd;
             e.target.setSelectionRange(atAfter, atAfter);
@@ -82,6 +110,8 @@ function handleInputEvent(e) {
 function setSettings(settings) {
     const urlMatches = getOrFail(settings, URL_MATCHES_KEY);
     const escapeChar = getOrFail(settings, ESCAPE_CHAR_KEY);
+
+    escapeCharLength = escapeChar.length;
 
     var urlMatched = false;
     for (const url of urlMatches) {
@@ -112,6 +142,7 @@ function setSettings(settings) {
                 for (const key of Object.keys(json)) {
                     abbreviations[escapeChar + key + " "] = json[key] + " ";
                 }
+                abbreviationsKeys = Object.keys(abbreviations);
             });
         const fixedEscapeChar = escapeChar in fixedEscapeChars ?
             fixedEscapeChars[escapeChar] : escapeChar;
