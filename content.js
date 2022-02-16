@@ -71,11 +71,18 @@ function longestMatchLength(str1, str2) {
 function getLongestAbbreviationMatch(match) {
     var longestMatch = 0;
     var longestMatchKey = null;
+    var longestMatchKeyLength = null;
     for (const key of abbreviationsKeys) {
         const matchLength = longestMatchLength(match, key);
         if (matchLength > longestMatch) {
             longestMatch = matchLength;
             longestMatchKey = key;
+            longestMatchKeyLength = longestMatchKey.length;
+        }
+        else if (matchLength === longestMatch &&
+                key.length < longestMatchKeyLength) {
+            longestMatchKey = key;
+            longestMatchKeyLength = longestMatchKey.length;
         }
     }
     if (longestMatch > escapeCharLength) {
