@@ -20,7 +20,7 @@ DEFAULT_SETTINGS[URL_MATCHES_KEY] = [
 ];
 
 chrome.runtime.onInstalled.addListener(function(details){
-    if (details.reason === "install") {
+    if (details.reason === INSTALL_REASON) {
         chrome.storage.sync.set(DEFAULT_SETTINGS);
     }
 });

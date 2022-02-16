@@ -152,6 +152,7 @@ chrome.storage.sync.get(
             setSettings(settings);
         }
         catch {
+            // guard code in case the default settings weren't loaded
             setSettings(DEFAULT_SETTINGS);
             chrome.storage.sync.set(DEFAULT_SETTINGS);
         }
