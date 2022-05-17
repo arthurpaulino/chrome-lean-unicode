@@ -57,7 +57,7 @@ saveButton.onclick = () => {
     settings[ESCAPE_CHAR_ID] = escapeCharField.innerText;
     settings[IS_ON_ID]       = onByDefaultField.checked;
     settings[URL_MATCHES_ID] = urlMatchesField.innerText    
-        .replace(/[;,\s\n]+/g, "\n").split("\n");
+        .replace(/[;,\s\n]+/g, "\n").trim().split("\n");
     chrome.storage.sync.set(
         settings,
         () => {
